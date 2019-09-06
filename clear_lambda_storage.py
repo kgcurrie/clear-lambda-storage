@@ -5,7 +5,6 @@ from __future__ import print_function
 import argparse
 import boto3
 import queue
-from boto3.session import Session
 from botocore.exceptions import ClientError
 
 
@@ -16,7 +15,7 @@ def list_available_lambda_regions():
     Enumerates list of all Lambda regions
     :return: list of regions
     """
-    session = Session()
+    session = boto3.session.Session()
     return session.get_available_regions('lambda')
 
 
@@ -36,10 +35,11 @@ def init_boto_client(client_name, region, args):
             region_name=region
         )
     elif args.profile:
-        session = boto3.session.Session(profile_name=args.profile)
-        boto_client = session.client(client_name, region_name=region)
+        session = boto3.session.Session(profile_name=args.profile, region_name=region)
+        boto_client = session.client(client_name)
     else:
-        boto_client = boto3.client(client_name, region_name=region)
+        session = boto3.session.Session(region_name=region)
+        boto_client = session.client(client_name)
 
     return boto_client
 
@@ -108,6 +108,16 @@ def remove_old_lambda_versions(args):
 
     for region in regions:
         print('Scanning {} region'.format(region))
+
+        # 2019-09-06: credentials are not valid in ap-east-1.
+        # this tests for the condition in all regions and allows the script
+        # to proceed onto other regions
+        sts_client = init_boto_client('sts', region, args)
+        try:
+            _ = sts_client.get_caller_identity()
+        except:
+            print("Couldn't use the client credentials with this region")
+            continue
 
         lambda_client = init_boto_client('lambda', region, args)
         function_generator = lambda_function_generator(lambda_client)
