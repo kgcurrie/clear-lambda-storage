@@ -1,0 +1,22 @@
+{
+  "name": "clear-lambda-storage",
+  "version": "1.0.0",
+  "description": "Removes old versions of Lambda functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kgcurrie/clear-lambda-storage.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kgcurrie/clear-lambda-storage/issues"
+  },
+  "homepage": "https://github.com/kgcurrie/clear-lambda-storage#readme",
+  "devDependencies": {
+    "serverless": "^1.51.0"
+  }
+}
